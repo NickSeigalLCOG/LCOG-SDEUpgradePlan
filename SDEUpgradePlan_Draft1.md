@@ -56,8 +56,8 @@ Geometry
 
 
 ## Sources
-(1) A quick tour of enterprise geodatabase upgrades
+(1) Upgrading a geodatabase in SQL Server
 http://resources.arcgis.com/en/help/main/10.2/index.html#/A_quick_tour_of_enterprise_geodatabase_upgrades/002q0000005p000000/
 
-An overview of the Geodatabase Administration toolset
+(2) Geodatabase Administration toolset
 http://resources.arcgis.com/en/help/main/10.2/index.html#/An_overview_of_the_Geodatabase_Administration_toolset/001700000009000000/
