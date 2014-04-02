@@ -126,6 +126,10 @@ I recommend that right away we migrate the geometry types at the very least for 
 I also recommend migrating datasets in other geodatabases to native geometry, though this can be done gradually. Having all datasets on native geometry will simplify making views and ETLs in the future. At the least, I would like to convert internal LCOG datasets, while recommending partners allow us to do the same.
 
 
+#### SDE User
+
+#### Notification
+
 ## Sources
 (1) Upgrading a geodatabase in SQL Server.
 http://resources.arcgis.com/en/help/main/10.2/index.html#/A_quick_tour_of_enterprise_geodatabase_upgrades/002q0000005p000000/
