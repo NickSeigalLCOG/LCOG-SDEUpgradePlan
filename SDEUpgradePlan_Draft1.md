@@ -57,7 +57,8 @@ Also, notify staff & partners of downtimes, with assurances of plan & regression
 
 #### Backup Plan
 
-We currently back up a selection of the geodatabases on gisrv106 (EugeneGeo, LCOGGeo, Regional) every night after 7pm. Our process currently uses the sdeexport command-line tool to make .sdx files for each geodatabase object. Since the command-line tools will be deprecated after ArcSDE 10.2.x, we should be looking for another backup method. It is also implied that the .sdx backup format will deprecate along with sdeexport & sdeimport. Suggested backup methods include genarlly copying datasets to other workspaces, XML workspace exports, and whatever SQL Server backup methods are at our disposal. There are three backup concepts to consider: dataset backups (currently done via sdeexport), whole database backups (not done currently for gisrv106 GDBs), and server backups (not done for gisrv106 unless we have a plan I don't know about).
+We currently back up a selection of the geodatabases on gisrv106 (EugeneGeo, LCOGGeo, Regional) every night after 7pm. Our process currently uses the sdeexport command-line tool to make .sdx files for each geodatabase object. Since the command-line tools will be deprecated after ArcSDE 10.2.x, we should be looking for another backup method. It is also implied that the .sdx backup format will deprecate along with sdeexport & sdeimport. Suggested backup methods include genarlly copying datasets to other workspaces, XML workspace exports, and whatever SQL Server backup methods are at our disposal. There are three backup concepts to consider: dataset backups (currently done via sdeexport), whole database backups (I see 3 days of recent backups for most GDBs on gisrv106 occurring around 11pm), and server snapshots (not done for gisrv106 unless we have a plan I don't know about).
+
 
 ##### Recommended Action
 
