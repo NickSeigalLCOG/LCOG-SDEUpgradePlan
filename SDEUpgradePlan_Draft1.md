@@ -25,8 +25,8 @@ These steps are based on Esri's recommended procedure for upgrading a geodatabas
 For each database being upgraded:
 
 1. Create backups of the geodatabase (see 'Backup Plan' under 'Considerations' below).
-2. Remove any custom functionality you may have added to the geodatabase system tables outside ArcGIS such as: triggers, participation in SQL Server replication, or additional indexes (note: we haven't do this). The upgrade procedure cannot take into account customizations you make to the system tables. If such customizations prevent the alteration of a system table's schema, the upgrade will fail.
-  - Note: LCOG have any of these customizations that I know of.
+2. Remove any custom functionality you may have added to the geodatabase system tables outside ArcGIS such as: triggers, participation in SQL Server replication, or additional indexes. The upgrade procedure cannot take into account customizations you make to the system tables. If such customizations prevent the alteration of a system table's schema, the upgrade will fail.
+  - Note: LCOG doesn't have any of these customizations.
 3. Disconnect remaining users from the geodatabase, and block any new connections (right-click > Properties > Connections).
 4. If you are using an ArcSDE service:
   i.   Stop (do not pause) the service, via Windows Services.
@@ -46,25 +46,24 @@ For each database being upgraded:
 
 #### Downtime
 
-Geodatabase upgrades need to happen during a period of time where no users will need access for a decently-sized amount of time. For that reason, it would be best to perform the upgrade over a weekend. The only required access needed on weekends is for the LCOG ETL processing. The ETLs can easily be paused, then activated after the upgrade & initial testing is complete. For that purpose, I recommend that the primary ETL geodatabases get priority (LCOGGeo, RLIDGeo, Staging).
+Geodatabase upgrades need to happen during a period of time when no users will need access for a decently-sized period of time. For that reason, it would be best to perform the upgrade over a weekend. The only required access needed on weekends is for the LCOG ETL processing. The ETLs can easily be paused, then activated after the upgrade and initial testing is complete. For that purpose, I recommend that the ETL geodatabases get priority (LCOGGeo, RLIDGeo, Staging).
 
 ##### Recommended Action
 
-Pick a weekend for the upgrade. I will be around, willing, and family-less from April 20th to May 8th. I recommend the weekend April 25-27, if we can get notifications out early enough.
-
-Also, notify staff & partners of downtimes, with assurances of plan & regression precautions.
+1. Notify staff and partners of downtimes, with assurances of plan and regression precautions. Notify by April 11.
+2. Upgrade weekend April 26-27.
 
 
 #### Backup Plan
 
-We currently back up a selection of the geodatabases on gisrv106 (EugeneGeo, LCOGGeo, Regional) every night after 7pm. Our process currently uses the sdeexport command-line tool to make .sdx files for each geodatabase object. Since the command-line tools will be deprecated after ArcSDE 10.2.x, we should be looking for another backup method. It is also implied that the .sdx backup format will deprecate along with sdeexport & sdeimport. Suggested backup methods include genarlly copying datasets to other workspaces, XML workspace exports, and whatever SQL Server backup methods are at our disposal. There are three backup concepts to consider: dataset backups (currently done via sdeexport), whole database backups (I see 3 days of recent backups for most GDBs on gisrv106 occurring around 11pm), and server snapshots (not done for gisrv106 unless we have a plan I don't know about).
+We currently back up a selection of the geodatabases on gisrv106 (EugeneGeo, LCOGGeo, Regional) every night after 7 pm. Our process currently uses the sdeexport command-line tool to make .sdx files for each geodatabase object. Since the command-line tools will be deprecated after ArcSDE 10.2.x, we should be looking for another backup method. It is also implied that the .sdx backup format will deprecate along with sdeexport and sdeimport. Suggested backup methods include copying datasets to other workspaces, XML workspace exports, and whatever SQL Server backup methods are at our disposal. There are three backup concepts to consider: dataset backups (currently done via sdeexport), whole database backups (I see 3 days of recent backups for most GDBs on gisrv106 occurring around 11pm), and server snapshots (not done for gisrv106 unless we have a plan I don't know about).
 
 
 ##### Recommended Action
 
-For the purposes of an upgrade, I recommend we compress and back up each geodatabase immediately preceding its upgrade. Backups should be done not only via our standard backup method, but also via duplicating the database on the server. This will allow for faster regression, as the duplicate will essentially be the geodatabase still at the older version but with a slightly different name (e.g. RLIDGeo_Backup100).
-
-Later, we need to determine a new best-fit backup plan for our needs before moving beyond SDE 10.2.
+1. For the purposes of an upgrade, I recommend we compress and back up each geodatabase immediately preceding its upgrade.
+2. Backups should be done not only via our standard backup method, but also via duplicating the database on the server. This will allow for faster regression, as the duplicate will essentially be the geodatabase still at the older version but with a slightly different name (e.g. RLIDGeo_Backup100).
+3. Later, we need to determine a new best-fit backup plan for our needs before moving beyond SDE 10.2.
 
 
 #### Regression Plan
@@ -74,25 +73,25 @@ There is no formal mechanism to downgrade a geodatabase to an older version. If 
 
 #### Application Server - Services/Native Client
 
-Since we are running ArcSDE 10.0, we are therefore also running the application server, which provides services access to geodatabases rather than direct connections. From 10.1 onward, the application server is a separately-installed application from ArcSDE: in fact ArcSDE is wholly contained in the geodatabase (and client, to be complete) sans application. LCOG has been insisting on direct connections to our geodatabases for a while now, which removes the need for running services and installing the application server.
+Since we are running ArcSDE 10.0, we are therefore also running the application server, which provides services access to geodatabases rather than direct connections. From 10.1 onward, the application server is a separately-installed application from ArcSDE. In fact, ArcSDE is wholly contained in the geodatabase (and client, to be complete) sans application. LCOG has been insisting on direct connections to our geodatabases for a while now, which removes the need for running services and installing the application server.
 
 ##### Recommended Action
 
-I recommend we turn off services and not reinstall the application server after the upgrade. If any users have yet to switch to direct connections, this will finally push them to take what is a simple step.
+1. I recommend we turn off services and not reinstall the application server after the upgrade. If any users have yet to switch to direct connections, this will finally push them to take what is a fairly simple step (creating direct connections and updating map documents and layer files).
+2. Offer technical support in the form of arcpy scripting to users needing to update mxd or lyr files to use direct connections.
 
 
 #### Command-Line Tools
 
-The ArcSDE command-line tools will be deprecated after 10.2.x. Functionality that uses them will need to find other methods to serve needs. We currently have three primary uses for the command-line tools:
+The ArcSDE command-line tools will be deprecated after 10.2.x. Functionality that uses them will need to find other methods to serve those needs. We currently have three primary uses for the command-line tools:
 1. Managing users/locks. We may have some shell scripts that still use these, but for the most part we have moved to using ArcCatalog, ArcToolbox, and SQL Server to take care of our needs.
 2. Exporting backup files (see 'Backup Plan').
-3. Write-offs of shapefiles and coverages in various ETLs using sde2cov & sde2shp. These are mostly only in place for write-offs to Eugene's app staging data.
+3. Write-offs of shapefiles and coverages in various ETLs using sde2cov and sde2shp. These are mostly only in place for write-offs to Eugene's app staging data.
 
 ##### Recommended Action
 
-Install the ArcSDE command-line tools at upgrade.
-
-Later, follow recommendations under 'Backup Plan'. Refactor the ETLs that use sde2cov/sde2shp to use other methods.
+1. Install the ArcSDE command-line tools at upgrade.
+2. Later, follow recommendations under 'Backup Plan'. Refactor the ETLs that use sde2cov and sde2shp to use other methods.
 
 
 #### Versioned Views
@@ -103,11 +102,9 @@ LCOG has very few multiversioned views, relating to land use and site address up
 
 ##### Recommended Action
 
-I would recommend we choose one of these actions:
-1. Enable VVs on our versioned datasets, but leave the MVVs we have in place. Eventually replace the MVVs with the VVs as we refactor the ETLs they participate in.
-2. Do away with pushing data from publication to maintenance in this way. The only data that actually needs to be on a maintenance dataset is directly-maintained data. These data pushes are likely for maintainers' reference, and could be related or joined to the maintained data in lookup tables that wouldn't require version editing to update.
-
-Beyond that choice, I recommend that we activate the versioned views for all versioned datasets after we upgrade the geodatabase, seeing as they usually on by default.
+1. Enable VVs on our versioned datasets, but leave the MVVs we have in place. 
+2. Eventually, replace the MVVs with the VVs as we refactor the ETLs they participate in.
+3. Explore doing away with pushing data from publication to maintenance in this way. The only data that actually needs to be on a maintenance dataset is directly-maintained data. These data pushes are likely for maintainers' reference, and could be related or joined to the maintained data in lookup tables that wouldn't require version editing to update.
 
 
 #### Geometry
@@ -121,17 +118,16 @@ There are a number of advantages to using the native SQL Server type.
 4. SQL Server implements a subset of the OGC spatial methods (plus some custom extensions), allowing geoprocessing (e.g. buffer, clip, merge, near, etc.) in SQL statements.
 5. Post-10.1, views are automatically spatial if they detect a native geometry type. Also, you can no longer create a spatial view with SDEBinary types except via the sdetable command-line tool (which will soon deprecate).
 
-In fact, the only disadvantage the native type seems to have is that Shape.area & Shape.length have been replaced by Shape.STArea() and Shape.STLength() (the equivalent OGC methods), which ArcGIS doesn't omit correctly or cleanly rename in exports/copies. Also, older SQL Server versions (2005 and earlier) can't handle native geometry. The only SQL Server setup we have that is that old is gisrv112, which Bob & I have developed a workaround for (views excluding the geometry, plus knowing gisrv112 is going away soon).
+In fact, the only disadvantage the native type seems to have is that Shape.area and Shape.length have been replaced by Shape.STArea() and Shape.STLength() (the equivalent OGC methods), which ArcGIS doesn't omit correctly or cleanly rename in exports/copies. Also, older SQL Server versions (2005 and earlier) can't handle native geometry. The only SQL Server setup we have that is that old is gisrv112, which Bob and I have developed a workaround for (views excluding the geometry, plus knowing gisrv112 is going away soon).
 
 There is a Migrate Storage tool that converts geometry or raster storage on a chosen dataset.
 
-Migration is already occuring ad-hoc on many of our GDB feature classes: the geometry storage configuration is set to "default", and some of our admins have been creating datasets with ArcGIS 10.1 or 10.2 (me, it was me). These ad-hoc feature classes are mostly in the Staging area.
+Migration is already occuring ad-hoc on many of our GDB feature classes: the geometry storage configuration is set to "default", and some of our recent feature classes have been created with ArcGIS 10.1 or 10.2 (so far, these ad-hoc feature classes are mostly in the Staging database).
 
 ##### Recommended Action
 
-Ensure that the geometry storage configuration is set to "default" on all GDBs. This will ensure that future feature classes use the preferred storage type.
-
-For the most part, leave geometry storage on existing feature classes be. I do recommend that we migrate Staging and RLIDGeo's at the least. All new datasets in the Staging geodatabase are already using native geometry, and work just fine. If RLIDGeo were migrated, we could perform the Monday toggle in SQL itself, making the toggle blazing fast.
+1. Ensure that the geometry storage configuration is set to "default" on all GDBs. This will ensure that future feature classes use the preferred storage type.
+2. For the most part, leave geometry storage on existing feature classes be. I do recommend that we migrate Staging and RLIDGeo's at the least. All new datasets in the Staging geodatabase are already using native geometry, and work just fine. If RLIDGeo were migrated, we could perform the Monday toggle in SQL itself, making the toggle blazingly fast.
 
 
 #### SDE User
@@ -142,9 +138,8 @@ Changing the schema table owner requires creating an entirely new geodatabase, t
 
 ##### Recommended Action
 
-Upgrade without getting involved in this for now. Everything will continue to work just fine this way. 
-
-Consider fixing on internal/developer geodatabases (e.g. Staging), as these have few users/roles and can be constructed over time without de-syncing datasets.
+1. Upgrade without getting involved in this for now. Everything will continue to work just fine this way.
+2. Fix on internal/developer geodatabases (e.g. Staging), as these have few users/roles and can be constructed over time without de-syncing datasets.
 
 
 #### Partner Notification & Testing
@@ -157,7 +152,8 @@ A more careful consideration needs to be undertaken for LCOG- or partner-loading
 
 ##### Recommended Action
 
-* Send notifications out to either all geodatabase users or their area managers as soon as we choose an upgrade window. * Get test duplicates of each geodatabase upgraded, and offer primary stakeholders in each geodatabase testing access.
+1. Send notifications out to either all geodatabase users or their area managers as soon as we choose an upgrade window.
+2. Get test duplicates of each geodatabase upgraded, and offer primary stakeholders in each geodatabase testing access.
 
 
 #### Geodatabases
